@@ -65,6 +65,19 @@ GlobalInfo::~GlobalInfo()
 			}
 		}
 	}
+
+	{
+		SYNC(m_FreeMatchCS);
+		for (auto itor = m_FreeMatchList.begin(); itor != m_FreeMatchList.end(); )
+		{
+			if (itor != m_FreeMatchList.end())
+			{
+				WorkInfo* temp = (*itor);
+				delete temp;
+				itor = m_FreeMatchList.erase(itor);
+			}
+		}
+	}
 }
 
 void GlobalInfo::Initialize()
@@ -77,6 +90,7 @@ void GlobalInfo::Initialize()
 	int lose = 0;
 
 	SYNC( m_UserCS );
+	// 유저 정보 랜덤 세팅
 	for (int i = 0; i < 100; i++)
 	{
 		User* user = new User();
@@ -95,6 +109,7 @@ void GlobalInfo::Initialize()
 	}
 	printf("=======================\n");
 
+	// Room 메모리 풀
 	for (int i = 0; i < DF_MAX_ROOM_COUNT; i++)
 	{
 		Room* room = new Room();
@@ -102,6 +117,14 @@ void GlobalInfo::Initialize()
 			CS(m_FreeRoomCS);
 			m_FreeRoomList.push_back(room);
 		}
+	}
+
+	// 매칭 메모리 풀
+	for (int i = 0; i < DF_FREE_MATCH_COUNT; i++)
+	{
+		WorkInfo* work = new WorkInfo();
+		CS(m_FreeMatchCS);
+		m_FreeMatchList.push_back(work);
 	}
 }
 
@@ -204,5 +227,49 @@ void GlobalInfo::InitRoom(Room* pRoom)
 	{
 		return;
 	}
-	
+}
+
+WorkInfo* GlobalInfo::CreateWorkInfo()
+{
+	WorkInfo* pWork = nullptr;
+	CS(m_FreeMatchCS);
+	pWork = m_FreeMatchList.front();
+
+	if (pWork == nullptr)
+	{
+		pWork = new WorkInfo();
+	}
+	else
+	{
+		m_FreeMatchList.pop_front();
+	}
+
+	return pWork;
+}
+
+void GlobalInfo::InitWorkInfo(WorkInfo* work)
+{
+	WorkInfo* pUseWork = work;
+
+	if (pUseWork != nullptr)
+	{
+		{
+			CS(m_MatchCS);
+			for (auto itor = m_MatchList.begin(); itor != m_MatchList.end(); itor++)
+			{
+				if (*(itor) == pUseWork)
+				{
+					m_MatchList.erase(itor);
+					break;
+				}
+			}
+		}
+
+		pUseWork->Initialize();
+
+		{
+			CS(m_FreeMatchCS);
+			m_FreeMatchList.push_back(pUseWork);
+		}
+	}
 }

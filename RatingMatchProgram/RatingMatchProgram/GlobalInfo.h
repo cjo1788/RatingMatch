@@ -3,6 +3,7 @@
 #include "Global.h"
 #include "SingleTon.h"
 #include "CriticalSection.h"
+#include "User.h"
 
 class User;
 class Room;
@@ -29,6 +30,11 @@ struct WorkInfo
 		m_User = nullptr;
 	}
 
+	void Initialize()
+	{
+
+	}
+
 	void AddRatingMax(DWORD dwValue)
 	{
 		m_MatchRatingMax += dwValue;
@@ -48,6 +54,11 @@ struct WorkInfo
 	{
 		return m_MatchRatingMin;
 	}
+
+	bool Compare(WorkInfo* first, WorkInfo* second)
+	{
+		return (first->m_User->GetRating() <= second->m_User->GetRating() );
+	}
 };
 
 class GlobalInfo : public SingleTon<GlobalInfo>
@@ -63,8 +74,14 @@ public:
 	Room* CreateRoom();
 	void InitRoom(Room* pRoom);
 
+	WorkInfo* CreateWorkInfo();
+	void InitWorkInfo(WorkInfo* work);
+
 	CS m_UserCS;
 	list<User*> m_UserList;
+
+	CS m_FreeMatchCS;
+	list<WorkInfo*> m_FreeMatchList;
 
 	CS m_MatchCS;
 	list<WorkInfo*> m_MatchList;

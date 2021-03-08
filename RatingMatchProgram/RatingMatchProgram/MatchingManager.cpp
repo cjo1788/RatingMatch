@@ -37,6 +37,8 @@ int MatchingThread::Run()
 				WorkInfo* pWork1 = nullptr;
 				WorkInfo* pWork2 = nullptr;
 
+				// GLOBALINFO->m_MatchList.sort(&WorkInfo::Compare);
+
 				auto itor = GLOBALINFO->m_MatchList.begin();
 				auto itor2 = GLOBALINFO->m_MatchList.begin();
 
@@ -95,8 +97,10 @@ int MatchingThread::Run()
 
 					// erase
 					//printf("»èÁ¦!!! UserSN1 : %d, UserSN2 : %d\n", (*itor)->m_User->GetSN(), (*itor2)->m_User->GetSN());
-					GLOBALINFO->m_MatchList.erase(itor);
-					GLOBALINFO->m_MatchList.erase(itor2);
+					GLOBALINFO->InitWorkInfo(*itor);
+					GLOBALINFO->InitWorkInfo(*itor2);
+					//GLOBALINFO->m_MatchList.erase(itor);
+					//GLOBALINFO->m_MatchList.erase(itor2);
 				}
 			}
 		}

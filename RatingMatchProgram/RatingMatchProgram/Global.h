@@ -16,3 +16,4 @@ using namespace std;
 #define DF_MATCH_RATING_DEFAULT 10
 #define DF_MATCHING_MIN_TIME	3000
 #define DF_MAX_ROOM_COUNT		100
+#define DF_FREE_MATCH_COUNT		1000

@@ -37,7 +37,8 @@ int JoinThread::Run()
 
 				iUserRating = pUser->GetRating();
 
-				WorkInfo* work = new WorkInfo();
+				WorkInfo* work = GLOBALINFO->CreateWorkInfo();
+
 				if (iUserRating - DF_MATCH_RATING_DEFAULT < 0)
 				{
 					iRatingMin = 0;

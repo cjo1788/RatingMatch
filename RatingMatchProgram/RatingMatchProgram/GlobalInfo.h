@@ -55,10 +55,7 @@ struct WorkInfo
 		return m_MatchRatingMin;
 	}
 
-	bool Compare(WorkInfo* first, WorkInfo* second)
-	{
-		return (first->m_User->GetRating() <= second->m_User->GetRating() );
-	}
+
 };
 
 class GlobalInfo : public SingleTon<GlobalInfo>
@@ -75,7 +72,10 @@ public:
 	void InitRoom(Room* pRoom);
 
 	WorkInfo* CreateWorkInfo();
-	void InitWorkInfo(WorkInfo* work);
+	list<WorkInfo*>::iterator InitWorkInfo(WorkInfo* work);
+
+	void SortMatchList();
+	void PrintMatchList();
 
 	CS m_UserCS;
 	list<User*> m_UserList;

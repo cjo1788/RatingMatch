@@ -247,9 +247,10 @@ WorkInfo* GlobalInfo::CreateWorkInfo()
 	return pWork;
 }
 
-void GlobalInfo::InitWorkInfo(WorkInfo* work)
+list<WorkInfo*>::iterator GlobalInfo::InitWorkInfo(WorkInfo* work)
 {
 	WorkInfo* pUseWork = work;
+	list<WorkInfo*>::iterator return_itor = m_MatchList.end();
 
 	if (pUseWork != nullptr)
 	{
@@ -259,7 +260,7 @@ void GlobalInfo::InitWorkInfo(WorkInfo* work)
 			{
 				if (*(itor) == pUseWork)
 				{
-					m_MatchList.erase(itor);
+					return_itor = m_MatchList.erase(itor);
 					break;
 				}
 			}
@@ -271,5 +272,25 @@ void GlobalInfo::InitWorkInfo(WorkInfo* work)
 			CS(m_FreeMatchCS);
 			m_FreeMatchList.push_back(pUseWork);
 		}
+	}
+
+	return return_itor;
+}
+
+void GlobalInfo::SortMatchList()
+{
+	CS(m_MatchCS);
+	m_MatchList.sort([](WorkInfo* first, WorkInfo* second) -> bool
+	{
+		return ( first->m_User->GetRating() < second->m_User->GetRating() ? true : false );
+	} );
+}
+
+void GlobalInfo::PrintMatchList()
+{
+	CS(m_matchCS);
+	for (const auto& match : m_MatchList)
+	{
+		printf("Rating : %d, User : %d\n", match->m_User->GetRating(), match->m_User->GetSN());
 	}
 }

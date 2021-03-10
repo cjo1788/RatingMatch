@@ -37,34 +37,58 @@ int MatchingThread::Run()
 				WorkInfo* pWork1 = nullptr;
 				WorkInfo* pWork2 = nullptr;
 
-				// GLOBALINFO->m_MatchList.sort(&WorkInfo::Compare);
-
+				GLOBALINFO->SortMatchList();
+				GLOBALINFO->PrintMatchList(); // sort check
 				auto itor = GLOBALINFO->m_MatchList.begin();
-				auto itor2 = GLOBALINFO->m_MatchList.begin();
+				auto itor2 = itor;
 
-				for (; itor != GLOBALINFO->m_MatchList.end(); ++itor)
+				for (; itor != GLOBALINFO->m_MatchList.end(); )
 				{
-					for (; itor2 != GLOBALINFO->m_MatchList.end(); ++itor2)
+					itor2 = itor;
+					itor2++;
+					if (itor2 == GLOBALINFO->m_MatchList.end())
+						break;
+
+					if (itor != itor2 && (*itor)->m_User != nullptr && (*itor2)->m_User != nullptr && (*itor)->m_User != (*itor2)->m_User)
 					{
-						if (itor != itor2 && (*itor)->m_User != nullptr && (*itor2)->m_User != nullptr && (*itor)->m_User != (*itor2)->m_User)
+						DWORD dwRating = (*itor2)->m_User->GetRating();
+						if (dwRating >= (*itor)->m_MatchRatingMin && dwRating <= (*itor)->m_MatchRatingMax)
 						{
-							DWORD dwRating = (*itor2)->m_User->GetRating();
-							if (dwRating >= (*itor)->m_MatchRatingMin && dwRating <= (*itor)->m_MatchRatingMax)
-							{
-								pWork1 = (*itor);
-								pWork2 = (*itor2);
-								byCheck = 1;
-								//printf("==============\n");
-								//printf("¸ÅÄªÃ£À½!! UserSN1 : %d, RatingMax : %d, RatingMin : %d, Rating : %d\n", pWork1->m_User->GetSN(), pWork1->GetRatingMax(), pWork1->GetRatingMin(), pWork1->m_User->GetRating());
-								//printf("¸ÅÄªÃ£À½!! UserSN2 : %d, RatingMax : %d, RatingMin : %d, Rating : %d\n", pWork2->m_User->GetSN(), pWork2->GetRatingMax(), pWork2->GetRatingMin(), pWork2->m_User->GetRating());
-								//printf("==============\n");
-								break;
-							}
+							pWork1 = (*itor);
+							pWork2 = (*itor2);
+							byCheck = 1;
+							printf("==============\n");
+							printf("¸ÅÄªÃ£À½!! UserSN1 : %d, RatingMax : %d, RatingMin : %d, Rating : %d\n", pWork1->m_User->GetSN(), pWork1->GetRatingMax(), pWork1->GetRatingMin(), pWork1->m_User->GetRating());
+							printf("¸ÅÄªÃ£À½!! UserSN2 : %d, RatingMax : %d, RatingMin : %d, Rating : %d\n", pWork2->m_User->GetSN(), pWork2->GetRatingMax(), pWork2->GetRatingMin(), pWork2->m_User->GetRating());
+							printf("==============\n");
 						}
 					}
+
 					if (byCheck == 1)
 					{
-						break;
+						//join
+						Room* pRoom = nullptr;
+						pRoom = GLOBALINFO->CreateRoom();
+						pRoom->Enter((*itor)->m_User);
+						pRoom->Enter((*itor2)->m_User);
+
+						(*itor)->m_User->SetState(UserState::START);
+						(*itor2)->m_User->SetState(UserState::START);
+
+						{
+							CS(GLOBALINFO->m_UseRoomCS);
+							GLOBALINFO->m_UseRoomList.push_back(pRoom);
+						}
+
+						pRoom->SetState(RoomState::ROOM_ENTER);
+
+						// erase
+						itor = GLOBALINFO->InitWorkInfo(*itor);
+
+						if (itor == itor2)
+							itor = GLOBALINFO->InitWorkInfo(*itor2);
+						else
+							GLOBALINFO->InitWorkInfo(*itor2);
 					}
 					else
 					{
@@ -74,33 +98,9 @@ int MatchingThread::Run()
 						{
 							(*itor)->DisRatingMin(DF_MATCH_RATING_DEFAULT);
 						}
+
+						++itor;
 					}
-				}
-
-				if (byCheck == 1)
-				{
-					//join
-					Room* pRoom = nullptr;
-					pRoom = GLOBALINFO->CreateRoom();
-					pRoom->Enter((*itor)->m_User);
-					pRoom->Enter((*itor2)->m_User);
-
-					(*itor)->m_User->SetState(UserState::START);
-					(*itor2)->m_User->SetState(UserState::START);
-
-					{
-						CS(GLOBALINFO->m_UseRoomCS);						
-						GLOBALINFO->m_UseRoomList.push_back(pRoom);
-					}
-
-					pRoom->SetState(RoomState::ROOM_ENTER);
-
-					// erase
-					//printf("»èÁ¦!!! UserSN1 : %d, UserSN2 : %d\n", (*itor)->m_User->GetSN(), (*itor2)->m_User->GetSN());
-					GLOBALINFO->InitWorkInfo(*itor);
-					GLOBALINFO->InitWorkInfo(*itor2);
-					//GLOBALINFO->m_MatchList.erase(itor);
-					//GLOBALINFO->m_MatchList.erase(itor2);
 				}
 			}
 		}

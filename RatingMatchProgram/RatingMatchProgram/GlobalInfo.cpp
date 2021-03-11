@@ -141,7 +141,7 @@ void GlobalInfo::Join()
 
 		iUserRating = pUser->GetRating();
 
-		WorkInfo* work = new WorkInfo();
+		WorkInfo* work = CreateWorkInfo();
 		if (iUserRating - DF_MATCH_RATING_DEFAULT < 0)
 		{
 			iRatingMin = 0;

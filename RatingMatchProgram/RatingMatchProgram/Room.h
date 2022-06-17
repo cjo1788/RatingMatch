@@ -4,15 +4,7 @@
 
 class User;
 
-enum RoomState
-{
-	ROOM_NONE = 0,
-	ROOM_ENTER,
-	ROOM_READY,
-	ROOM_STARTING,
-	ROOM_END,
-	ROOM_OVER
-};
+
 
 struct Slot
 {

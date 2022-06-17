@@ -2,6 +2,7 @@
 #include "CriticalSection.h"
 #include "User.h"
 #include "Room.h"
+#include "Enum.h"
 
 GlobalInfo::GlobalInfo()
 {
@@ -12,8 +13,8 @@ GlobalInfo::~GlobalInfo()
 {
 	{
 		SYNC(m_UserCS);
-		list<User*>::iterator itor;
-		for (itor = m_UserList.begin(); itor != m_UserList.end(); )
+
+		for (auto itor = m_UserList.begin(); itor != m_UserList.end(); )
 		{
 			if (itor != m_UserList.end())
 			{
@@ -28,8 +29,7 @@ GlobalInfo::~GlobalInfo()
 
 	{
 		SYNC(m_MatchCS);
-		list<WorkInfo*>::iterator itor;
-		for (itor = m_MatchList.begin(); itor != m_MatchList.end(); )
+		for (auto itor = m_MatchList.begin(); itor != m_MatchList.end(); )
 		{
 			if (itor != m_MatchList.end())
 			{
@@ -95,7 +95,7 @@ void GlobalInfo::Initialize()
 	{
 		User* user = new User();
 		sn = i;
-		rating = rand() % ( DF_RATING_MAX - DF_RATING_MIN ) + DF_RATING_MIN;
+		rating = rand() % (iRating_Max - iRating_Min) + iRating_Min;
 
 		user->SetUserInfo(sn, rating, win, lose, UserState::READY);
 
@@ -110,7 +110,7 @@ void GlobalInfo::Initialize()
 	printf("=======================\n");
 
 	// Room 메모리 풀
-	for (int i = 0; i < DF_MAX_ROOM_COUNT; i++)
+	for (int i = 0; i < iMatch_Room_Count; i++)
 	{
 		Room* room = new Room();
 		{
@@ -120,56 +120,11 @@ void GlobalInfo::Initialize()
 	}
 
 	// 매칭 메모리 풀
-	for (int i = 0; i < DF_FREE_MATCH_COUNT; i++)
+	for (int i = 0; i < iFree_Match_Count; i++)
 	{
 		WorkInfo* work = new WorkInfo();
 		CS(m_FreeMatchCS);
 		m_FreeMatchList.push_back(work);
-	}
-}
-
-void GlobalInfo::Join()
-{
-	for (auto itor = m_UserList.begin(); itor != m_UserList.end(); ++itor)
-	{
-		int iRatingMax = 0;
-		int iRatingMin = 0;
-		int iRating = 0;
-		int iUserRating = 0;
-
-		User* pUser = (*itor);
-
-		iUserRating = pUser->GetRating();
-
-		WorkInfo* work = CreateWorkInfo();
-		if (iUserRating - DF_MATCH_RATING_DEFAULT < 0)
-		{
-			iRatingMin = 0;
-		}
-		else
-		{
-			iRatingMin = iUserRating - DF_MATCH_RATING_DEFAULT;
-		}
-
-		iRating = iUserRating / 1000;
-
-		iRatingMax = iUserRating + DF_MATCH_RATING_DEFAULT;
-
-		work->m_User = pUser;
-		work->m_MatchRatingMax = iRatingMax;
-		work->m_MatchRatingMin = iRatingMin;
-		work->m_dwMatchingTime = timeGetTime();
-
-		{
-			CS(m_MatchCS);
-			m_MatchList.push_back(work);
-		}
-	}
-
-	printf("match List====\n");
-	for (auto itor : m_MatchList)
-	{
-		printf("%d %d\n", itor->m_User->GetSN(), itor->m_User->GetRating());
 	}
 }
 
@@ -210,7 +165,6 @@ void GlobalInfo::InitRoom(Room* pRoom)
 				}
 				else
 				{
-					// ???
 					return;
 				}
 			}
@@ -247,10 +201,11 @@ WorkInfo* GlobalInfo::CreateWorkInfo()
 	return pWork;
 }
 
-list<WorkInfo*>::iterator GlobalInfo::InitWorkInfo(WorkInfo* work)
+using return_itor = typename list<WorkInfo*>::iterator;
+return_itor GlobalInfo::InitWorkInfo(WorkInfo* work)
 {
 	WorkInfo* pUseWork = work;
-	list<WorkInfo*>::iterator return_itor = m_MatchList.end();
+	return_itor temp_itor = m_MatchList.end();
 
 	if (pUseWork != nullptr)
 	{
@@ -260,7 +215,7 @@ list<WorkInfo*>::iterator GlobalInfo::InitWorkInfo(WorkInfo* work)
 			{
 				if (*(itor) == pUseWork)
 				{
-					return_itor = m_MatchList.erase(itor);
+					temp_itor = m_MatchList.erase(itor);
 					break;
 				}
 			}
@@ -274,7 +229,7 @@ list<WorkInfo*>::iterator GlobalInfo::InitWorkInfo(WorkInfo* work)
 		}
 	}
 
-	return return_itor;
+	return temp_itor;
 }
 
 void GlobalInfo::SortMatchList()

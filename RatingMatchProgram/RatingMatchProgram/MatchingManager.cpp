@@ -3,6 +3,7 @@
 #include "GlobalInfo.h"
 #include "User.h"
 #include "Room.h"
+#include "Enum.h"
 
 MatchingThread::MatchingThread()
 {
@@ -93,10 +94,10 @@ int MatchingThread::Run()
 					else
 					{
 						//printf("¸ÅÄª¸øÃ£À½!! UserSN : %d, RatingMax : %d, RatingMin : %d, Rating : %d\n", (*itor)->m_User->GetSN(), (*itor)->GetRatingMax(), (*itor)->GetRatingMin(), (*itor)->m_User->GetRating());
-						(*itor)->AddRatingMax(DF_MATCH_RATING_DEFAULT);
+						(*itor)->AddRatingMax(iMatch_Rating_Default);
 						if ((*itor)->GetRatingMin() > 10)
 						{
-							(*itor)->DisRatingMin(DF_MATCH_RATING_DEFAULT);
+							(*itor)->DisRatingMin(iMatch_Rating_Default);
 						}
 
 						++itor;

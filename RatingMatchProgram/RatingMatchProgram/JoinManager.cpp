@@ -1,6 +1,8 @@
 #include "JoinManager.h"
 #include "GlobalInfo.h"
 #include "User.h"
+#include "Enum.h"
+#include "Struct.h"
 
 JoinThread::JoinThread()
 {
@@ -24,49 +26,54 @@ int JoinThread::Run()
 	{
 		CS(GLOBALINFO->m_UserCS);
 
-		for (auto itor = GLOBALINFO->m_UserList.begin(); itor != GLOBALINFO->m_UserList.end(); ++itor)
+		for (auto userInfo : GLOBALINFO->m_UserList)
 		{
-			User* pUser = (*itor);
+			if (userInfo->GetState() != UserState::READY)
+				continue;
 
-			if (pUser->GetState() == READY)
+			auto UserRatingInfo = GetUserRatingInfo(userInfo->GetRating());
+
+			userInfo->SetState(UserState::MATCHING);
+
+			auto work = GLOBALINFO->CreateWorkInfo();
+			work->PackingWorkInfo(userInfo, UserRatingInfo, timeGetTime());
+
 			{
-				int iRatingMax = 0;
-				int iRatingMin = 0;
-				int iRating = 0;
-				int iUserRating = 0;
-
-				iUserRating = pUser->GetRating();
-
-				WorkInfo* work = GLOBALINFO->CreateWorkInfo();
-
-				if (iUserRating - DF_MATCH_RATING_DEFAULT < 0)
-				{
-					iRatingMin = 0;
-				}
-				else
-				{
-					iRatingMin = iUserRating - DF_MATCH_RATING_DEFAULT;
-				}
-
-				iRating = iUserRating / 1000;
-
-				iRatingMax = iUserRating + DF_MATCH_RATING_DEFAULT;
-
-				pUser->SetState(UserState::MATCHING);
-				work->m_User = pUser;
-				work->m_MatchRatingMax = iRatingMax;
-				work->m_MatchRatingMin = iRatingMin;
-				work->m_dwMatchingTime = timeGetTime();
-
-				{
-					CS(GLOBALINFO->m_MatchCS);
-					GLOBALINFO->m_MatchList.push_back(work);
-				}
+				CS(GLOBALINFO->m_MatchCS);
+				GLOBALINFO->m_MatchList.push_back(work);
 			}
 		}
 	}
 
 	return 0;
+}
+
+void JoinThread::PackingUserMatchInfo(WorkInfo* work )
+{
+
+}
+
+RatingInfo JoinThread::GetUserRatingInfo(DWORD rating)
+{
+	RatingInfo result;
+	int iRatingMax = 0;
+	int iRatingMin = 0;
+
+	if (rating - iMatch_Rating_Default < 0)
+	{
+		iRatingMin = 0;
+	}
+	else
+	{
+		iRatingMin = rating - iMatch_Rating_Default;
+	}
+
+	iRatingMax = rating + iMatch_Rating_Default;
+
+	result.MaxRating = iRatingMax;
+	result.MinRating = iRatingMin;
+
+	return result;
 }
 
 JoinManager::JoinManager()

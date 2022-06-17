@@ -4,6 +4,7 @@
 #include "SingleTon.h"
 #include "CriticalSection.h"
 #include "User.h"
+#include "Struct.h"
 
 class User;
 class Room;
@@ -28,11 +29,21 @@ struct WorkInfo
 	~WorkInfo()
 	{
 		m_User = nullptr;
+		printf("WorkInfo º“∏Í¿⁄ »£√‚!!!\n");
+		Sleep(10);
 	}
 
 	void Initialize()
 	{
 
+	}
+
+	void PackingWorkInfo(User* user, RatingInfo ratinginfo, DWORD time)
+	{
+		m_User = user;
+		m_MatchRatingMax = ratinginfo.MaxRating;
+		m_MatchRatingMin = ratinginfo.MinRating;
+		m_dwMatchingTime = time;
 	}
 
 	void AddRatingMax(DWORD dwValue)
@@ -66,13 +77,13 @@ public:
 
 	void Initialize();
 
-	void Join();
-
 	Room* CreateRoom();
 	void InitRoom(Room* pRoom);
 
 	WorkInfo* CreateWorkInfo();
-	list<WorkInfo*>::iterator InitWorkInfo(WorkInfo* work);
+
+	using return_itor = typename list<WorkInfo*>::iterator;
+	return_itor InitWorkInfo(WorkInfo* work);
 
 	void SortMatchList();
 	void PrintMatchList();

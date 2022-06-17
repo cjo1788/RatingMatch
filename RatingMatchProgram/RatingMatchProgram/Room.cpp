@@ -1,5 +1,6 @@
 #include "Room.h"
 #include "User.h"
+#include "Enum.h"
 
 Room::Room()
 {

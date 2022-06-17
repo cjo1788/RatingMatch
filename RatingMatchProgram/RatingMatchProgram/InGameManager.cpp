@@ -1,5 +1,6 @@
 #include "InGameManager.h"
 #include "Room.h"
+#include "Enum.h"
 
 InGameThread::InGameThread()
 {

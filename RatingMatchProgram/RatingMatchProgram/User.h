@@ -1,14 +1,6 @@
 #pragma once
 #include "Global.h"
 
-enum UserState
-{
-	NONE = 0,
-	READY = 1,
-	MATCHING = 2,
-	START = 3,
-};
-
 class User
 {
 private:

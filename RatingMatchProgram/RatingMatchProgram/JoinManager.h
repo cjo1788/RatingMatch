@@ -3,6 +3,8 @@
 #include "GlobalInfo.h"
 #include "SingleTon.h"
 
+struct RatingInfo;
+
 class JoinThread
 {
 private:
@@ -13,6 +15,9 @@ public:
 
 	void Initialize();
 	int Run();
+
+	void PackingUserMatchInfo(WorkInfo* work);
+	RatingInfo GetUserRatingInfo(DWORD rating);
 };
 
 class JoinManager : public SingleTon<JoinManager>

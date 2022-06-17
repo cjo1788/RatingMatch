@@ -65,14 +65,14 @@ void User::SetState(BYTE byState)
 void User::PVPWin()
 {
 	m_dwWin += 1;
-	m_dwRating += DF_MATCH_RATING_DEFAULT;
+	m_dwRating += iMatch_Rating_Default;
 }
 
 void User::PVPLose()
 {
 	m_dwLose += 1;
-	if (m_dwRating - DF_MATCH_RATING_DEFAULT < DF_RATING_MIN)
-		m_dwRating = DF_RATING_MIN;
+	if (m_dwRating - iMatch_Rating_Default < iRating_Min)
+		m_dwRating = iRating_Min;
 	else
-		m_dwRating -= DF_MATCH_RATING_DEFAULT;
+		m_dwRating -= iMatch_Rating_Default;
 }

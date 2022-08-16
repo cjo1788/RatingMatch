@@ -1,6 +1,6 @@
 #pragma once
 
-enum UserState
+enum class UserState
 {
 	NONE = 0,
 	READY = 1,
@@ -8,7 +8,7 @@ enum UserState
 	START = 3,
 };
 
-enum RoomState
+enum class RoomState
 {
 	ROOM_NONE = 0,
 	ROOM_ENTER,

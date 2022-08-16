@@ -24,12 +24,12 @@ void Room::Initialize()
 	m_byRound = 0;
 }
 
-void Room::SetState(BYTE byState)
+void Room::SetState(RoomState byState)
 {
 	m_byState = byState;
 }
 
-BYTE Room::GetState()
+RoomState Room::GetState()
 {
 	return m_byState;
 }

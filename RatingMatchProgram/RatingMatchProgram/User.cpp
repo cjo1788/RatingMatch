@@ -1,4 +1,5 @@
 #include "User.h"
+#include "Enum.h"
 
 User::User()
 {
@@ -6,7 +7,7 @@ User::User()
 	m_dwRating = 0;
 	m_dwWin = 0;
 	m_dwLose = 0;
-	m_byState = 0;
+	m_byState = UserState::NONE;
 }
 
 User::~User()
@@ -14,7 +15,7 @@ User::~User()
 
 }
 
-void User::GetUserInfo(DWORD& dwSN, DWORD& dwRating, DWORD& dwWin, DWORD& dwLose, BYTE& byState)
+void User::GetUserInfo(DWORD& dwSN, DWORD& dwRating, DWORD& dwWin, DWORD& dwLose, UserState& byState)
 {
 	dwSN = m_dwSN;
 	dwRating = m_dwRating;
@@ -23,7 +24,7 @@ void User::GetUserInfo(DWORD& dwSN, DWORD& dwRating, DWORD& dwWin, DWORD& dwLose
 	byState = m_byState;
 }
 
-void User::SetUserInfo(DWORD dwSN, DWORD dwRating, DWORD dwWin, DWORD dwLose, BYTE byState)
+void User::SetUserInfo(DWORD dwSN, DWORD dwRating, DWORD dwWin, DWORD dwLose, UserState byState)
 {
 	m_dwSN = dwSN;
 	m_dwRating = dwRating;
@@ -52,12 +53,12 @@ DWORD User::GetLose()
 	return m_dwLose;
 }
 
-BYTE User::GetState()
+UserState User::GetState()
 {
 	return m_byState;
 }
 
-void User::SetState(BYTE byState)
+void User::SetState(UserState byState)
 {
 	m_byState = byState;
 }

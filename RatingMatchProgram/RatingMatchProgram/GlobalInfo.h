@@ -9,8 +9,6 @@
 class User;
 class Room;
 
-
-
 struct WorkInfo
 {
 	User* m_User;

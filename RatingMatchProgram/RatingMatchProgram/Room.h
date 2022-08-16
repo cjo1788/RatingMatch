@@ -1,10 +1,8 @@
 #pragma once
 #include "Global.h"
 
-
 class User;
-
-
+enum class RoomState;
 
 struct Slot
 {
@@ -18,7 +16,7 @@ private:
 	// user
 	Slot m_Slot[2];
 	DWORD m_dwTime;
-	BYTE m_byState;
+	RoomState m_byState;
 	BYTE m_byRound;
 
 public:
@@ -27,8 +25,8 @@ public:
 
 	void Initialize();
 
-	void SetState(BYTE byState);
-	BYTE GetState();
+	void SetState(RoomState byState);
+	RoomState GetState();
 
 	void Enter(User* pUser);
 	void PVP();
